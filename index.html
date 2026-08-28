@@ -8,18 +8,52 @@
         body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #111; }
         h1 { font-size: 2rem; margin-bottom: 10px; }
         p { color: #555; font-size: 1.1rem; }
-        input { padding: 10px; width: 70%; font-size: 1rem; margin-right: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 10px 20px; font-size: 1rem; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+        select, input { padding: 10px; width: 100%; font-size: 1rem; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 20px; font-size: 1rem; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
+        .checklist { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px solid #eee; display: none; }
     </style>
 </head>
 <body>
     <h1>Paperweld</h1>
     <p>Turning the burden of medical spa compliance into clear, trusted practice.</p>
-    <p>Join our early access list for automated state checklists and audit-ready records.</p>
     
-    <div style="margin-top: 30px;">
-        <input type="email" placeholder="Enter your work email">
-        <button onclick="alert('Thanks for joining the early access list!')">Request Access</button>
+    <h3>Generate State Compliance Checklist</h3>
+    <label for="state">Select Your State:</label>
+    <select id="state">
+        <option value="California">California</option>
+        <option value="Texas">Texas</option>
+        <option value="Florida">Florida</option>
+        <option value="New York">New York</option>
+    </select>
+
+    <label for="treatment">Primary Treatment:</label>
+    <input type="text" id="treatment" placeholder="e.g., Botox, Laser Hair Removal">
+
+    <button onclick="generateChecklist()">Generate Requirements</button>
+
+    <div id="result" class="checklist">
+        <h4 id="result-title" style="margin-top:0;"></h4>
+        <ul id="result-list"></ul>
     </div>
+
+    <script>
+        function generateChecklist() {
+            const state = document.getElementById('state').value;
+            const treatment = document.getElementById('treatment').value || 'General Aesthetics';
+            
+            const resultDiv = document.getElementById('result');
+            const resultTitle = document.getElementById('result-title');
+            const resultList = document.getElementById('result-list');
+
+            resultTitle.innerText = `Compliance Requirements for ${treatment} in ${state}:`;
+            resultList.innerHTML = `
+                <li>Medical Director oversight agreement verified for ${state}.</li>
+                <li>Good Faith Exam (GFE) protocol established prior to ${treatment}.</li>
+                <li>State board licensed practitioner requirement confirmed.</li>
+                <li>Emergency equipment and adverse event logs ready for audit.</li>
+            `;
+            resultDiv.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
