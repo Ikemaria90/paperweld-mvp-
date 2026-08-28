@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paperweld | Medical Spa Compliance & Audit Readiness</title>
+    <title>Paperweld | Medical Spa Compliance & Early Access</title>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -20,7 +20,7 @@
             background-color: var(--bg-color);
             color: var(--text-primary);
             max-width: 640px; 
-            margin: 40px auto; 
+            margin: 60px auto; 
             padding: 24px; 
             line-height: 1.5; 
         }
@@ -28,34 +28,56 @@
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 32px;
+            padding: 40px 32px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            text-align: center;
         }
         .logo-container {
-            text-align: center;
             margin-bottom: 24px;
         }
         .logo-container img {
-            max-width: 180px;
+            max-width: 160px;
             height: auto;
             border-radius: 8px;
         }
-        h1 { font-size: 1.8rem; margin-top: 0; margin-bottom: 8px; letter-spacing: -0.5px; text-align: center; }
-        .tagline { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 28px; text-align: center; }
-        h3 { font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 24px; margin-bottom: 16px; }
-        label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
-        select, input { 
+        h1 { 
+            font-size: 2rem; 
+            margin-top: 0; 
+            margin-bottom: 12px; 
+            letter-spacing: -0.5px; 
+        }
+        .tagline { 
+            color: var(--text-secondary); 
+            font-size: 1.15rem; 
+            margin-bottom: 32px; 
+            line-height: 1.6;
+        }
+        .early-access-box {
+            text-align: left;
+            background: var(--bg-color);
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        label { 
+            display: block; 
+            font-size: 0.95rem; 
+            font-weight: 500; 
+            margin-bottom: 8px; 
+            color: var(--text-primary); 
+        }
+        input { 
             padding: 12px; 
             width: 100%; 
             font-size: 1rem; 
-            margin-bottom: 20px; 
+            margin-bottom: 16px; 
             background-color: var(--input-bg);
             border: 1px solid var(--border-color); 
             color: var(--text-primary);
             border-radius: 6px; 
             box-sizing: border-box; 
         }
-        select:focus, input:focus {
+        input:focus {
             outline: none;
             border-color: #58a6ff;
         }
@@ -73,17 +95,6 @@
         }
         button:hover { background: var(--accent-hover); }
         button:disabled { background: #1a5c27; cursor: not-allowed; }
-        .checklist { 
-            margin-top: 24px; 
-            background: var(--bg-color); 
-            padding: 20px; 
-            border-radius: 8px; 
-            border: 1px solid var(--border-color); 
-            display: none; 
-        }
-        .checklist ul { padding-left: 20px; margin-bottom: 0; color: var(--text-primary); }
-        .checklist li { margin-bottom: 10px; }
-        .export-box { margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; }
     </style>
 </head>
 <body>
@@ -94,172 +105,28 @@
         <h1>Paperweld</h1>
         <p class="tagline">Turning the burden of medical spa compliance into clear, trusted practice.</p>
         
-        <h3>Generate State Compliance Checklist</h3>
-        <label for="state">Select Your State:</label>
-        <select id="state">
-            <option value="California">California</option>
-            <option value="Texas">Texas</option>
-            <option value="Florida">Florida</option>
-            <option value="New York">New York</option>
-        </select>
-
-        <label for="treatment">Primary Treatment:</label>
-        <input type="text" id="treatment" placeholder="e.g., Botox, Laser, Filler, IV Therapy">
-
-        <button onclick="generateChecklist()">Generate Requirements</button>
-
-        <div id="result" class="checklist">
-            <h4 id="result-title" style="margin-top:0; color: #58a6ff;"></h4>
-            <ul id="result-list"></ul>
-            
-            <div class="export-box">
-                <label for="user-email">Save and email this complete audit report:</label>
-                <input type="email" id="user-email" name="email" placeholder="name@medspa.com" required>
-                <button id="submit-btn" onclick="saveReport()">Email Full Report</button>
-            </div>
+        <div class="early-access-box">
+            <label for="early-email">Get notified when early access opens:</label>
+            <input type="email" id="early-email" placeholder="name@medspa.com">
+            <button id="access-btn" onclick="submitEarlyAccess()">Request Early Access</button>
         </div>
     </div>
 
     <script>
-        const complianceDatabase = {
-            "California": {
-                default: [
-                    "Medical Board of California (MBC) supervisory agreement verified.",
-                    "Good Faith Exam (GFE) performed by authorized physician, PA, or NP prior to treatment.",
-                    "Standardized procedures established for registered nurse (RN) execution.",
-                    "Emergency crash kit, medications, and adverse event logs on site."
-                ],
-                laser: [
-                    "Physician or authorized provider initial consultation and patient evaluation.",
-                    "Strict adherence to laser classification and direct/indirect supervision limits.",
-                    "Operator competency certification records up to date."
-                ],
-                filler: [
-                    "High-risk vascular occlusion management protocol and emergency hyaluronidase supply on hand.",
-                    "Advanced anatomical injection competency documentation verified."
-                ],
-                iv: [
-                    "Compounded nutrient sourcing compliance under strict state pharmacy and board guidelines.",
-                    "Patient baseline labs and physician sign-off protocol verified for infusion therapy."
-                ]
-            },
-            "Texas": {
-                default: [
-                    "Texas Medical Board (TMB) delegation protocols and standing orders signed.",
-                    "Physician-patient relationship established prior to aesthetic procedure.",
-                    "Licensed practitioner status confirmed through state board registry.",
-                    "Emergency response protocol and equipment inspected."
-                ],
-                laser: [
-                    "Non-ablative or ablative laser certificate displayed per TMB rules.",
-                    "Physician supervision rules followed according to laser type."
-                ],
-                filler: [
-                    "Informed consent detailing specific vascular and tissue complication risks.",
-                    "Hyaluronidase emergency protocol and standing delegation orders active."
-                ],
-                iv: [
-                    "Direct or indirect physician supervision of vitamin/hydration infusion therapy.",
-                    "Strict aseptic compounding and ingredient traceability logs maintained."
-                ]
-            },
-            "Florida": {
-                default: [
-                    "Florida Board of Medicine supervisory protocols established.",
-                    "Initial patient GFE conducted by physician, PA, or APRN before treatment delivery.",
-                    "Licensed medical director oversight agreement active.",
-                    "Adverse incident reporting and emergency equipment protocols ready."
-                ],
-                laser: [
-                    "Written protocols for cosmetic laser procedures signed by Medical Director.",
-                    "Staff credentialing and laser safety training documentation verified."
-                ],
-                filler: [
-                    "Dermal filler adverse event management and emergency reversal protocol established.",
-                    "Product lot number tracking and patient chart documentation confirmed."
-                ],
-                iv: [
-                    "Medical director protocol for micronutrient and IV hydration therapies.",
-                    "Emergency crash cart readiness for anaphylaxis or adverse infusion reactions."
-                ]
-            },
-            "New York": {
-                default: [
-                    "NY Education Department & Department of Health medical practice compliance verified.",
-                    "Mandatory pre-treatment medical evaluation conducted under physician oversight.",
-                    "Strict practitioner scope of practice and delegation rules enforced.",
-                    "Emergency equipment and clinical documentation logs maintained for audit."
-                ],
-                laser: [
-                    "Laser procedures classified as practice of medicine; strict physician delegation required.",
-                    "Operator training and safety credential verification logs completed."
-                ],
-                filler: [
-                    "Strict physician oversight for schedule or deep dermal treatments.",
-                    "Emergency occlusion and vascular complication workflow established."
-                ],
-                iv: [
-                    "Nutritional and IV infusion oversight protocols approved by supervising physician.",
-                    "Sterile compounding logs and licensed administration verification."
-                ]
-            }
-        };
-
-        function generateChecklist() {
-            const state = document.getElementById('state').value;
-            const treatmentInput = document.getElementById('treatment').value.toLowerCase();
-            
-            const resultDiv = document.getElementById('result');
-            const resultTitle = document.getElementById('result-title');
-            const resultList = document.getElementById('result-list');
-
-            let requirements = [...complianceDatabase[state].default];
-            
-            if (treatmentInput.includes('laser') || treatmentInput.includes('hair removal') || treatmentInput.includes('light')) {
-                requirements = requirements.concat(complianceDatabase[state].laser);
-            }
-            if (treatmentInput.includes('filler') || treatmentInput.includes('lip') || treatmentInput.includes('cheek')) {
-                requirements = requirements.concat(complianceDatabase[state].filler);
-            }
-            if (treatmentInput.includes('iv') || treatmentInput.includes('infusion') || treatmentInput.includes('hydration') || treatmentInput.includes('vitamin')) {
-                requirements = requirements.concat(complianceDatabase[state].iv);
-            }
-
-            resultTitle.innerText = `Compliance Requirements for ${document.getElementById('treatment').value || 'Aesthetics'} in ${state}:`;
-            
-            let listHTML = '';
-            requirements.forEach(req => {
-                listHTML += `<li>${req}</li>`;
-            });
-            resultList.innerHTML = listHTML;
-            
-            resultDiv.style.display = 'block';
-        }
-
-        function saveReport() {
-            const email = document.getElementById('user-email').value;
-            const state = document.getElementById('state').value;
-            const treatment = document.getElementById('treatment').value || 'Aesthetics';
-            const button = document.getElementById('submit-btn');
-            const listItems = document.querySelectorAll('#result-list li');
+        function submitEarlyAccess() {
+            const email = document.getElementById('early-email').value;
+            const button = document.getElementById('access-btn');
             
             if(!email) {
                 alert('Please enter a valid work email first.');
                 return;
             }
 
-            // Gather the checklist items to send in the email
-            let reportText = `State: ${state}\nTreatment: ${treatment}\n\nRequirements:\n`;
-            listItems.forEach(item => {
-                reportText += `- ${item.innerText}\n`;
-            });
-
-            // Update button text while sending
             const originalText = button.innerText;
-            button.innerText = 'Sending...';
+            button.innerText = 'Submitting...';
             button.disabled = true;
 
-            // Send data to Formspree
+            // Connected to your active Formspree backend
             fetch('https://formspree.io/f/myeyyzpz', {
                 method: 'POST',
                 headers: {
@@ -268,22 +135,21 @@
                 },
                 body: JSON.stringify({
                     email: email,
-                    message: reportText
+                    source: 'Early Access Landing Page Request'
                 })
             })
             .then(response => {
                 if (response.ok) {
-                    alert(`Success! Audit report submitted by ${email}. Check your Formspree inbox.`);
-                    document.getElementById('user-email').value = ''; // Clear input
+                    alert(`Success! ${email} has been added to the Paperweld early access waitlist.`);
+                    document.getElementById('early-email').value = '';
                 } else {
-                    alert('Oops! There was a problem sending the report.');
+                    alert('Oops! There was a problem submitting your request.');
                 }
             })
             .catch(error => {
                 alert('Network error. Please try again.');
             })
             .finally(() => {
-                // Restore button state
                 button.innerText = originalText;
                 button.disabled = false;
             });
