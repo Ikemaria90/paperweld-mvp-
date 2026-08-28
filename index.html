@@ -8,7 +8,6 @@ async function generateChecklist() {
     const tableBody = document.getElementById('result-table-body');
     const reportMeta = document.getElementById('report-meta');
     
-    // Show loading state
     tableBody.innerHTML = `<tr><td colspan="3" style="text-align: center; padding: 20px;">Generating AI compliance audit requirements for ${state}...</td></tr>`;
     pdfContent.style.display = 'block';
     exportSection.style.display = 'block';
@@ -33,7 +32,7 @@ async function generateChecklist() {
                 <tr>
                     <td style="text-align: center; font-weight: 600; color: #57606a;">AI-${index + 1}</td>
                     <td>${req}</td>
-                    <td style="text-align: center;"><span class="status-badge">Pending Review</span></td>
+                    <td style="text-align: center;"><span class="status-badge" style="background-color: #cf222e; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Pending Review</span></td>
                 </tr>
             `;
         });
