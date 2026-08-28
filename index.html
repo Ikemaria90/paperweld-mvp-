@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paperweld | Medical Spa Compliance & Audit Readiness</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --bg-color: #0d1117;
@@ -70,9 +71,17 @@
             cursor: pointer; 
             width: 100%; 
             transition: background 0.2s;
+            margin-bottom: 10px;
         }
         button:hover { background: var(--accent-hover); }
         button:disabled { background: #1a5c27; cursor: not-allowed; }
+        .secondary-btn {
+            background: #21262d;
+            border: 1px solid var(--border-color);
+        }
+        .secondary-btn:hover {
+            background: #30363d;
+        }
         .checklist { 
             margin-top: 24px; 
             background: var(--bg-color); 
@@ -98,10 +107,56 @@
         <h3>Generate State Compliance Checklist</h3>
         <label for="state">Select Your State:</label>
         <select id="state">
+            <option value="Alabama">Alabama</option>
+            <option value="Alaska">Alaska</option>
+            <option value="Arizona">Arizona</option>
+            <option value="Arkansas">Arkansas</option>
             <option value="California">California</option>
-            <option value="Texas">Texas</option>
+            <option value="Colorado">Colorado</option>
+            <option value="Connecticut">Connecticut</option>
+            <option value="Delaware">Delaware</option>
             <option value="Florida">Florida</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Hawaii">Hawaii</option>
+            <option value="Idaho">Idaho</option>
+            <option value="Illinois">Illinois</option>
+            <option value="Indiana">Indiana</option>
+            <option value="Iowa">Iowa</option>
+            <option value="Kansas">Kansas</option>
+            <option value="Kentucky">Kentucky</option>
+            <option value="Louisiana">Louisiana</option>
+            <option value="Maine">Maine</option>
+            <option value="Maryland">Maryland</option>
+            <option value="Massachusetts">Massachusetts</option>
+            <option value="Michigan">Michigan</option>
+            <option value="Minnesota">Minnesota</option>
+            <option value="Mississippi">Mississippi</option>
+            <option value="Missouri">Missouri</option>
+            <option value="Montana">Montana</option>
+            <option value="Nebraska">Nebraska</option>
+            <option value="Nevada">Nevada</option>
+            <option value="New Hampshire">New Hampshire</option>
+            <option value="New Jersey">New Jersey</option>
+            <option value="New Mexico">New Mexico</option>
             <option value="New York">New York</option>
+            <option value="North Carolina">North Carolina</option>
+            <option value="North Dakota">North Dakota</option>
+            <option value="Ohio">Ohio</option>
+            <option value="Oklahoma">Oklahoma</option>
+            <option value="Oregon">Oregon</option>
+            <option value="Pennsylvania">Pennsylvania</option>
+            <option value="Rhode Island">Rhode Island</option>
+            <option value="South Carolina">South Carolina</option>
+            <option value="South Dakota">South Dakota</option>
+            <option value="Tennessee">Tennessee</option>
+            <option value="Texas">Texas</option>
+            <option value="Utah">Utah</option>
+            <option value="Vermont">Vermont</option>
+            <option value="Virginia">Virginia</option>
+            <option value="Washington">Washington</option>
+            <option value="West Virginia">West Virginia</option>
+            <option value="Wisconsin">Wisconsin</option>
+            <option value="Wyoming">Wyoming</option>
         </select>
 
         <label for="treatment">Primary Treatment:</label>
@@ -109,12 +164,17 @@
 
         <button onclick="generateChecklist()">Generate Requirements</button>
 
-        <div id="result" class="checklist">
-            <h4 id="result-title" style="margin-top:0; color: #58a6ff;"></h4>
-            <ul id="result-list"></ul>
-            
+        <div id="pdf-content">
+            <div id="result" class="checklist">
+                <h4 id="result-title" style="margin-top:0; color: #58a6ff;"></h4>
+                <ul id="result-list"></ul>
+            </div>
+        </div>
+
+        <div id="export-section" style="display: none;">
             <div class="export-box">
-                <label for="user-email">Save and email this complete audit report:</label>
+                <button onclick="downloadPDF()" class="secondary-btn">📥 Download as PDF</button>
+                <label for="user-email" style="margin-top: 16px;">Save and email this complete audit report:</label>
                 <input type="email" id="user-email" placeholder="name@medspa.com">
                 <button id="submit-btn" onclick="saveReport()">Email Full Report</button>
             </div>
@@ -129,88 +189,27 @@
     </div>
 
     <script>
-        const complianceDatabase = {
-            "California": {
-                default: [
-                    "Medical Board of California (MBC) supervisory agreement verified.",
-                    "Good Faith Exam (GFE) performed by authorized physician, PA, or NP prior to treatment.",
-                    "Standardized procedures established for registered nurse (RN) execution.",
-                    "Emergency crash kit, medications, and adverse event logs on site."
-                ],
-                laser: [
-                    "Physician or authorized provider initial consultation and patient evaluation.",
-                    "Strict adherence to laser classification and direct/indirect supervision limits.",
-                    "Operator competency certification records up to date."
-                ],
-                filler: [
-                    "High-risk vascular occlusion management protocol and emergency hyaluronidase supply on hand.",
-                    "Advanced anatomical injection competency documentation verified."
-                ],
-                iv: [
-                    "Compounded nutrient sourcing compliance under strict state pharmacy and board guidelines.",
-                    "Patient baseline labs and physician sign-off protocol verified for infusion therapy."
-                ]
-            },
-            "Texas": {
-                default: [
-                    "Texas Medical Board (TMB) delegation protocols and standing orders signed.",
-                    "Physician-patient relationship established prior to aesthetic procedure.",
-                    "Licensed practitioner status confirmed through state board registry.",
-                    "Emergency response protocol and equipment inspected."
-                ],
-                laser: [
-                    "Non-ablative or ablative laser certificate displayed per TMB rules.",
-                    "Physician supervision rules followed according to laser type."
-                ],
-                filler: [
-                    "Informed consent detailing specific vascular and tissue complication risks.",
-                    "Hyaluronidase emergency protocol and standing delegation orders active."
-                ],
-                iv: [
-                    "Direct or indirect physician supervision of vitamin/hydration infusion therapy.",
-                    "Strict aseptic compounding and ingredient traceability logs maintained."
-                ]
-            },
-            "Florida": {
-                default: [
-                    "Florida Board of Medicine supervisory protocols established.",
-                    "Initial patient GFE conducted by physician, PA, or APRN before treatment delivery.",
-                    "Licensed medical director oversight agreement active.",
-                    "Adverse incident reporting and emergency equipment protocols ready."
-                ],
-                laser: [
-                    "Written protocols for cosmetic laser procedures signed by Medical Director.",
-                    "Staff credentialing and laser safety training documentation verified."
-                ],
-                filler: [
-                    "Dermal filler adverse event management and emergency reversal protocol established.",
-                    "Product lot number tracking and patient chart documentation confirmed."
-                ],
-                iv: [
-                    "Medical director protocol for micronutrient and IV hydration therapies.",
-                    "Emergency crash cart readiness for anaphylaxis or adverse infusion reactions."
-                ]
-            },
-            "New York": {
-                default: [
-                    "NY Education Department & Department of Health medical practice compliance verified.",
-                    "Mandatory pre-treatment medical evaluation conducted under physician oversight.",
-                    "Strict practitioner scope of practice and delegation rules enforced.",
-                    "Emergency equipment and clinical documentation logs maintained for audit."
-                ],
-                laser: [
-                    "Laser procedures classified as practice of medicine; strict physician delegation required.",
-                    "Operator training and safety credential verification logs completed."
-                ],
-                filler: [
-                    "Strict physician oversight for schedule or deep dermal treatments.",
-                    "Emergency occlusion and vascular complication workflow established."
-                ],
-                iv: [
-                    "Nutritional and IV infusion oversight protocols approved by supervising physician.",
-                    "Sterile compounding logs and licensed administration verification."
-                ]
-            }
+        const generalDefaults = [
+            "State Medical Board supervisory agreement verified.",
+            "Good Faith Exam (GFE) performed by authorized physician, PA, or NP prior to treatment.",
+            "Standardized procedures or standing delegation orders established for provider execution.",
+            "Emergency crash kit, reversal medications, and adverse event logs on site."
+        ];
+
+        const treatmentAddons = {
+            laser: [
+                "Physician or authorized provider initial consultation and patient evaluation.",
+                "Strict adherence to state laser classification and supervision limits.",
+                "Operator competency certification records maintained up to date."
+            ],
+            filler: [
+                "High-risk vascular occlusion management protocol and emergency hyaluronidase supply on hand.",
+                "Advanced anatomical injection competency documentation verified."
+            ],
+            iv: [
+                "Compounded nutrient sourcing compliance under strict state pharmacy and board guidelines.",
+                "Patient baseline labs and physician sign-off protocol verified for infusion therapy."
+            ]
         };
 
         function generateChecklist() {
@@ -218,19 +217,20 @@
             const treatmentInput = document.getElementById('treatment').value.toLowerCase();
             
             const resultDiv = document.getElementById('result');
+            const exportSection = document.getElementById('export-section');
             const resultTitle = document.getElementById('result-title');
             const resultList = document.getElementById('result-list');
 
-            let requirements = [...complianceDatabase[state].default];
+            let requirements = [...generalDefaults];
             
             if (treatmentInput.includes('laser') || treatmentInput.includes('hair removal') || treatmentInput.includes('light')) {
-                requirements = requirements.concat(complianceDatabase[state].laser);
+                requirements = requirements.concat(treatmentAddons.laser);
             }
-            if (treatmentInput.includes('filler') || treatmentInput.includes('lip') || treatmentInput.includes('cheek')) {
-                requirements = requirements.concat(complianceDatabase[state].filler);
+            if (treatmentInput.includes('filler') || treatmentInput.includes('lip') || treatmentInput.includes('cheek') || treatmentInput.includes('botox') || treatmentInput.includes('neurotoxin')) {
+                requirements = requirements.concat(treatmentAddons.filler);
             }
             if (treatmentInput.includes('iv') || treatmentInput.includes('infusion') || treatmentInput.includes('hydration') || treatmentInput.includes('vitamin')) {
-                requirements = requirements.concat(complianceDatabase[state].iv);
+                requirements = requirements.concat(treatmentAddons.iv);
             }
 
             resultTitle.innerText = `Compliance Requirements for ${document.getElementById('treatment').value || 'Aesthetics'} in ${state}:`;
@@ -242,6 +242,23 @@
             resultList.innerHTML = listHTML;
             
             resultDiv.style.display = 'block';
+            exportSection.style.display = 'block';
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('pdf-content');
+            const state = document.getElementById('state').value;
+            const treatment = document.getElementById('treatment').value || 'Aesthetics';
+            
+            const options = {
+                margin:       10,
+                filename:     `Paperweld-Audit-${state}-${treatment}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#0d1117' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().from(element).set(options).save();
         }
 
         function saveReport() {
