@@ -19,7 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-color);
             color: var(--text-primary);
-            max-width: 640px; 
+            max-width: 680px; 
             margin: 40px auto; 
             padding: 24px; 
             line-height: 1.5; 
@@ -81,27 +81,69 @@
         .secondary-btn:hover {
             background: #30363d;
         }
+        
+        /* Formal Report Table Styles */
         .checklist { 
             margin-top: 24px; 
-            background: var(--bg-color); 
-            padding: 20px; 
+            background: #ffffff; 
+            color: #000000;
+            padding: 24px; 
             border-radius: 8px; 
-            border: 1px solid var(--border-color); 
+            border: 1px solid #d0d7de; 
             display: none; 
         }
-        .checklist ul { padding-left: 20px; margin-bottom: 0; color: var(--text-primary); }
-        .checklist li { margin-bottom: 10px; }
+        .report-header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #0366d6;
+            padding-bottom: 10px;
+        }
+        .report-header-table td {
+            vertical-align: middle;
+        }
+        .audit-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+        .audit-table th, .audit-table td {
+            border: 1px solid #d0d7de;
+            padding: 10px 14px;
+            text-align: left;
+        }
+        .audit-table th {
+            background-color: #f6f8fa;
+            color: #24292e;
+            font-weight: 600;
+        }
+        .audit-table td {
+            color: #24292e;
+            background-color: #ffffff;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: #cf222e;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
         .export-box { margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; }
         .section-divider { margin: 32px 0 16px 0; border: none; border-top: 1px solid var(--border-color); }
 
-        /* Print-specific rules */
+        /* Print-specific rules for clean formal output */
         @media print {
             body { background-color: #ffffff !important; color: #000000 !important; max-width: 100%; margin: 0; padding: 10px; }
             .container { background-color: #ffffff !important; border: none; box-shadow: none; padding: 0; }
             .container > *:not(#pdf-content):not(#export-section) { display: none !important; }
             .export-box button, .export-box label, .export-box input { display: none !important; }
-            #pdf-content { display: block !important; background-color: #ffffff !important; color: #000000 !important; border: none !important; }
-            #pdf-content * { color: #000000 !important; }
+            #pdf-content { display: block !important; background-color: #ffffff !important; color: #000000 !important; border: none !important; padding: 0 !important; }
+            .audit-table th { background-color: #f6f8fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -173,14 +215,39 @@
 
         <button onclick="generateChecklist()">Generate Requirements</button>
 
+        <!-- Formal Structured Report Card -->
         <div id="pdf-content" class="checklist">
-            <h4 id="result-title" style="margin-top:0; color: #0366d6;"></h4>
-            <ul id="result-list"></ul>
+            <table class="report-header-table">
+                <tr>
+                    <td>
+                        <img src="Paperweld-logo.jpg" alt="Logo" style="max-width: 100px; height: auto; border-radius: 4px;">
+                    </td>
+                    <td style="text-align: right;">
+                        <h3 style="margin: 0; color: #0366d6; border: none; padding: 0;">PAPERWELD COMPLIANCE AUDIT</h3>
+                        <p id="report-meta" style="margin: 4px 0 0 0; font-size: 0.85rem; color: #57606a;"></p>
+                    </td>
+                </tr>
+            </table>
+            
+            <h4 id="result-title" style="margin-top:0; margin-bottom: 12px; color: #24292e; font-size: 1.05rem;"></h4>
+            
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">Ref</th>
+                        <th style="width: 74%;">Regulatory Requirement</th>
+                        <th style="width: 18%; text-align: center;">Status / Review</th>
+                    </tr>
+                </thead>
+                <tbody id="result-table-body">
+                    <!-- Dynamic Rows Go Here -->
+                </tbody>
+            </table>
         </div>
 
         <div id="export-section" style="display: none;">
             <div class="export-box">
-                <button onclick="window.print()" class="secondary-btn">📥 Save / Print PDF Report</button>
+                <button onclick="window.print()" class="secondary-btn">📥 Save / Print Formal PDF Report</button>
                 <label for="user-email" style="margin-top: 16px;">Save and email this complete audit report:</label>
                 <input type="email" id="user-email" placeholder="name@medspa.com">
                 <button id="submit-btn" onclick="saveReport()">Email Full Report</button>
@@ -222,11 +289,13 @@
         function generateChecklist() {
             const state = document.getElementById('state').value;
             const treatmentInput = document.getElementById('treatment').value.toLowerCase();
+            const treatmentName = document.getElementById('treatment').value || 'Aesthetics';
             
             const pdfContent = document.getElementById('pdf-content');
             const exportSection = document.getElementById('export-section');
             const resultTitle = document.getElementById('result-title');
-            const resultList = document.getElementById('result-list');
+            const tableBody = document.getElementById('result-table-body');
+            const reportMeta = document.getElementById('report-meta');
 
             let requirements = [...generalDefaults];
             
@@ -240,13 +309,21 @@
                 requirements = requirements.concat(treatmentAddons.iv);
             }
 
-            resultTitle.innerText = `Compliance Requirements for ${document.getElementById('treatment').value || 'Aesthetics'} in ${state}:`;
+            const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            reportMeta.innerText = `Generated: ${currentDate} | Jurisdiction: ${state}`;
+            resultTitle.innerText = `Compliance Audit Checklist: ${treatmentName} Practices in ${state}`;
             
-            let listHTML = '';
-            requirements.forEach(req => {
-                listHTML += `<li>${req}</li>`;
+            let rowsHTML = '';
+            requirements.forEach((req, index) => {
+                rowsHTML += `
+                    <tr>
+                        <td style="text-align: center; font-weight: 600; color: #57606a;">REQ-${index + 1}</td>
+                        <td>${req}</td>
+                        <td style="text-align: center;"><span class="status-badge">Pending Review</span></td>
+                    </tr>
+                `;
             });
-            resultList.innerHTML = listHTML;
+            tableBody.innerHTML = rowsHTML;
             
             pdfContent.style.display = 'block';
             exportSection.style.display = 'block';
@@ -257,7 +334,7 @@
             const state = document.getElementById('state').value;
             const treatment = document.getElementById('treatment').value || 'Aesthetics';
             const button = document.getElementById('submit-btn');
-            const listItems = document.querySelectorAll('#pdf-content li');
+            const tableRows = document.querySelectorAll('#result-table-body tr');
             
             if(!email) {
                 alert('Please enter a valid work email first.');
@@ -265,8 +342,9 @@
             }
 
             let reportText = `State: ${state}\nTreatment: ${treatment}\n\nRequirements:\n`;
-            listItems.forEach(item => {
-                reportText += `- ${item.innerText}\n`;
+            tableRows.forEach(row => {
+                const text = row.cells[1].innerText;
+                reportText += `- ${text}\n`;
             });
 
             const originalText = button.innerText;
@@ -282,7 +360,7 @@
                 body: JSON.stringify({
                     email: email,
                     message: reportText,
-                    source: 'Compliance Audit Report Generator'
+                    source: 'Formal Compliance Audit Report Generator'
                 })
             })
             .then(response => {
