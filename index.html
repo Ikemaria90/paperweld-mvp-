@@ -3,43 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paperweld | Medical Spa Compliance</title>
+    <title>Paperweld | Medical Spa Compliance & Audit Readiness</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; line-height: 1.6; color: #111; }
-        h1 { font-size: 2rem; margin-bottom: 10px; }
-        p { color: #555; font-size: 1.1rem; }
-        select, input { padding: 10px; width: 100%; font-size: 1rem; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { padding: 10px 20px; font-size: 1rem; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
-        .checklist { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px solid #eee; display: none; }
-        .export-box { margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --accent: #238636;
+            --accent-hover: #2ea043;
+            --input-bg: #0d1117;
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            max-width: 640px; 
+            margin: 40px auto; 
+            padding: 24px; 
+            line-height: 1.5; 
+        }
+        .container {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        h1 { font-size: 1.8rem; margin-top: 0; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .tagline { color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 28px; }
+        h3 { font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 24px; margin-bottom: 16px; }
+        label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 6px; color: var(--text-secondary); }
+        select, input { 
+            padding: 12px; 
+            width: 100%; 
+            font-size: 1rem; 
+            margin-bottom: 20px; 
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color); 
+            color: var(--text-primary);
+            border-radius: 6px; 
+            box-sizing: border-box; 
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #58a6ff;
+        }
+        button { 
+            padding: 12px 20px; 
+            font-size: 1rem; 
+            font-weight: 600;
+            background: var(--accent); 
+            color: #fff; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--accent-hover); }
+        .checklist { 
+            margin-top: 24px; 
+            background: var(--bg-color); 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            display: none; 
+        }
+        .checklist ul { padding-left: 20px; margin-bottom: 0; color: var(--text-primary); }
+        .checklist li { margin-bottom: 10px; }
+        .export-box { margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; }
     </style>
 </head>
 <body>
-    <h1>Paperweld</h1>
-    <p>Turning the burden of medical spa compliance into clear, trusted practice.</p>
-    
-    <h3>Generate State Compliance Checklist</h3>
-    <label for="state">Select Your State:</label>
-    <select id="state">
-        <option value="California">California</option>
-        <option value="Texas">Texas</option>
-        <option value="Florida">Florida</option>
-        <option value="New York">New York</option>
-    </select>
-
-    <label for="treatment">Primary Treatment:</label>
-    <input type="text" id="treatment" placeholder="e.g., Botox, Laser Hair Removal">
-
-    <button onclick="generateChecklist()">Generate Requirements</button>
-
-    <div id="result" class="checklist">
-        <h4 id="result-title" style="margin-top:0;"></h4>
-        <ul id="result-list"></ul>
+    <div class="container">
+        <h1>Paperweld</h1>
+        <p class="tagline">Turning the burden of medical spa compliance into clear, trusted practice.</p>
         
-        <div class="export-box">
-            <p style="font-size: 0.95rem; margin-bottom: 8px;">Save and email this complete audit report:</p>
-            <input type="email" id="user-email" placeholder="Enter your work email">
-            <button onclick="saveReport()">Email Full Report</button>
+        <h3>Generate State Compliance Checklist</h3>
+        <label for="state">Select Your State:</label>
+        <select id="state">
+            <option value="California">California</option>
+            <option value="Texas">Texas</option>
+            <option value="Florida">Florida</option>
+            <option value="New York">New York</option>
+        </select>
+
+        <label for="treatment">Primary Treatment:</label>
+        <input type="text" id="treatment" placeholder="e.g., Botox, Laser Hair Removal">
+
+        <button onclick="generateChecklist()">Generate Requirements</button>
+
+        <div id="result" class="checklist">
+            <h4 id="result-title" style="margin-top:0; color: #58a6ff;"></h4>
+            <ul id="result-list"></ul>
+            
+            <div class="export-box">
+                <label for="user-email">Save and email this complete audit report:</label>
+                <input type="email" id="user-email" placeholder="name@medspa.com">
+                <button onclick="saveReport()">Email Full Report</button>
+            </div>
         </div>
     </div>
 
