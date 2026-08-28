@@ -103,7 +103,7 @@
         </select>
 
         <label for="treatment">Primary Treatment:</label>
-        <input type="text" id="treatment" placeholder="e.g., Botox, Laser, Filler">
+        <input type="text" id="treatment" placeholder="e.g., Botox, Laser, Filler, IV Therapy">
 
         <button onclick="generateChecklist()">Generate Requirements</button>
 
@@ -132,6 +132,14 @@
                     "Physician or authorized provider initial consultation and patient evaluation.",
                     "Strict adherence to laser classification and direct/indirect supervision limits.",
                     "Operator competency certification records up to date."
+                ],
+                filler: [
+                    "High-risk vascular occlusion management protocol and emergency hyaluronidase supply on hand.",
+                    "Advanced anatomical injection competency documentation verified."
+                ],
+                iv: [
+                    "Compounded nutrient sourcing compliance under strict state pharmacy and board guidelines.",
+                    "Patient baseline labs and physician sign-off protocol verified for infusion therapy."
                 ]
             },
             "Texas": {
@@ -144,6 +152,14 @@
                 laser: [
                     "Non-ablative or ablative laser certificate displayed per TMB rules.",
                     "Physician supervision rules followed according to laser type."
+                ],
+                filler: [
+                    "Informed consent detailing specific vascular and tissue complication risks.",
+                    "Hyaluronidase emergency protocol and standing delegation orders active."
+                ],
+                iv: [
+                    "Direct or indirect physician supervision of vitamin/hydration infusion therapy.",
+                    "Strict aseptic compounding and ingredient traceability logs maintained."
                 ]
             },
             "Florida": {
@@ -156,6 +172,14 @@
                 laser: [
                     "Written protocols for cosmetic laser procedures signed by Medical Director.",
                     "Staff credentialing and laser safety training documentation verified."
+                ],
+                filler: [
+                    "Dermal filler adverse event management and emergency reversal protocol established.",
+                    "Product lot number tracking and patient chart documentation confirmed."
+                ],
+                iv: [
+                    "Medical director protocol for micronutrient and IV hydration therapies.",
+                    "Emergency crash cart readiness for anaphylaxis or adverse infusion reactions."
                 ]
             },
             "New York": {
@@ -168,6 +192,14 @@
                 laser: [
                     "Laser procedures classified as practice of medicine; strict physician delegation required.",
                     "Operator training and safety credential verification logs completed."
+                ],
+                filler: [
+                    "Strict physician oversight for schedule or deep dermal treatments.",
+                    "Emergency occlusion and vascular complication workflow established."
+                ],
+                iv: [
+                    "Nutritional and IV infusion oversight protocols approved by supervising physician.",
+                    "Sterile compounding logs and licensed administration verification."
                 ]
             }
         };
@@ -180,10 +212,16 @@
             const resultTitle = document.getElementById('result-title');
             const resultList = document.getElementById('result-list');
 
-            let requirements = complianceDatabase[state].default;
+            let requirements = [...complianceDatabase[state].default];
             
             if (treatmentInput.includes('laser') || treatmentInput.includes('hair removal') || treatmentInput.includes('light')) {
                 requirements = requirements.concat(complianceDatabase[state].laser);
+            }
+            if (treatmentInput.includes('filler') || treatmentInput.includes('lip') || treatmentInput.includes('cheek')) {
+                requirements = requirements.concat(complianceDatabase[state].filler);
+            }
+            if (treatmentInput.includes('iv') || treatmentInput.includes('infusion') || treatmentInput.includes('hydration') || treatmentInput.includes('vitamin')) {
+                requirements = requirements.concat(complianceDatabase[state].iv);
             }
 
             resultTitle.innerText = `Compliance Requirements for ${document.getElementById('treatment').value || 'Aesthetics'} in ${state}:`;
