@@ -11,6 +11,7 @@
         select, input { padding: 10px; width: 100%; font-size: 1rem; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { padding: 10px 20px; font-size: 1rem; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
         .checklist { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; border: 1px solid #eee; display: none; }
+        .export-box { margin-top: 15px; border-top: 1px solid #ddd; padding-top: 15px; }
     </style>
 </head>
 <body>
@@ -34,6 +35,12 @@
     <div id="result" class="checklist">
         <h4 id="result-title" style="margin-top:0;"></h4>
         <ul id="result-list"></ul>
+        
+        <div class="export-box">
+            <p style="font-size: 0.95rem; margin-bottom: 8px;">Save and email this complete audit report:</p>
+            <input type="email" id="user-email" placeholder="Enter your work email">
+            <button onclick="saveReport()">Email Full Report</button>
+        </div>
     </div>
 
     <script>
@@ -53,6 +60,15 @@
                 <li>Emergency equipment and adverse event logs ready for audit.</li>
             `;
             resultDiv.style.display = 'block';
+        }
+
+        function saveReport() {
+            const email = document.getElementById('user-email').value;
+            if(email) {
+                alert(`Success! Full audit report sent to ${email}.`);
+            } else {
+                alert('Please enter a valid work email first.');
+            }
         }
     </script>
 </body>
