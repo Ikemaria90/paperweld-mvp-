@@ -72,6 +72,7 @@
             transition: background 0.2s;
         }
         button:hover { background: var(--accent-hover); }
+        button:disabled { background: #1a5c27; cursor: not-allowed; }
         .checklist { 
             margin-top: 24px; 
             background: var(--bg-color); 
@@ -113,8 +114,8 @@
             
             <div class="export-box">
                 <label for="user-email">Save and email this complete audit report:</label>
-                <input type="email" id="user-email" placeholder="name@medspa.com">
-                <button onclick="saveReport()">Email Full Report</button>
+                <input type="email" id="user-email" name="email" placeholder="name@medspa.com" required>
+                <button id="submit-btn" onclick="saveReport()">Email Full Report</button>
             </div>
         </div>
     </div>
@@ -237,11 +238,55 @@
 
         function saveReport() {
             const email = document.getElementById('user-email').value;
-            if(email) {
-                alert(`Success! Full audit report sent to ${email}.`);
-            } else {
+            const state = document.getElementById('state').value;
+            const treatment = document.getElementById('treatment').value || 'Aesthetics';
+            const button = document.getElementById('submit-btn');
+            const listItems = document.querySelectorAll('#result-list li');
+            
+            if(!email) {
                 alert('Please enter a valid work email first.');
+                return;
             }
+
+            // Gather the checklist items to send in the email
+            let reportText = `State: ${state}\nTreatment: ${treatment}\n\nRequirements:\n`;
+            listItems.forEach(item => {
+                reportText += `- ${item.innerText}\n`;
+            });
+
+            // Update button text while sending
+            const originalText = button.innerText;
+            button.innerText = 'Sending...';
+            button.disabled = true;
+
+            // Send data to Formspree
+            fetch('https://formspree.io/f/myeyyzpz', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    message: reportText
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`Success! Audit report submitted by ${email}. Check your Formspree inbox.`);
+                    document.getElementById('user-email').value = ''; // Clear input
+                } else {
+                    alert('Oops! There was a problem sending the report.');
+                }
+            })
+            .catch(error => {
+                alert('Network error. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                button.innerText = originalText;
+                button.disabled = false;
+            });
         }
     </script>
 </body>
