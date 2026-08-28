@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ error: 'API key not configured on server.' });
+        return res.status(500).json({ error: 'API key is missing' });
     }
 
     try {
@@ -22,11 +22,11 @@ export default async function handler(req, res) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'You are an expert legal and medical spa compliance officer. Return a JSON array of string requirements for running a medical spa safely and legally based on the user state and treatment.'
+                        content: 'You are an expert regulatory compliance assistant for medical spas. Return a strict JSON array containing 5 compliance requirements for the given state and treatment. Each item must have "item", "description", and "status" fields.'
                     },
                     {
                         role: 'user',
-                        content: `Provide 5 specific compliance and audit readiness requirements for a medical spa performing ${treatment} in the state of ${state}. Return ONLY a valid JSON array of strings.`
+                        content: `Provide compliance requirements for ${treatment} in ${state}.`
                     }
                 ],
                 temperature: 0.3
@@ -34,14 +34,18 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
-        const aiText = data.choices[0].message.content;
         
-        // Clean up formatting blocks if model returns markdown ticks
+        if (!response.ok) {
+            throw new Error(data.error?.message || 'OpenAI API error');
+        }
+
+        const aiText = data.choices[0].message.content;
         const cleanedJSON = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
         const requirements = JSON.parse(cleanedJSON);
 
         return res.status(200).json({ requirements });
     } catch (error) {
-        return res.status(500).json({ error: 'Failed to generate AI compliance report.' });
+        console.error("DETAILED ERROR:", error);
+        return res.status(500).json({ error: error.message });
     }
 }
