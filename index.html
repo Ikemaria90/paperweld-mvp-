@@ -103,7 +103,7 @@
         </select>
 
         <label for="treatment">Primary Treatment:</label>
-        <input type="text" id="treatment" placeholder="e.g., Botox, Laser Hair Removal">
+        <input type="text" id="treatment" placeholder="e.g., Botox, Laser, Filler">
 
         <button onclick="generateChecklist()">Generate Requirements</button>
 
@@ -120,21 +120,80 @@
     </div>
 
     <script>
+        const complianceDatabase = {
+            "California": {
+                default: [
+                    "Medical Board of California (MBC) supervisory agreement verified.",
+                    "Good Faith Exam (GFE) performed by authorized physician, PA, or NP prior to treatment.",
+                    "Standardized procedures established for registered nurse (RN) execution.",
+                    "Emergency crash kit, medications, and adverse event logs on site."
+                ],
+                laser: [
+                    "Physician or authorized provider initial consultation and patient evaluation.",
+                    "Strict adherence to laser classification and direct/indirect supervision limits.",
+                    "Operator competency certification records up to date."
+                ]
+            },
+            "Texas": {
+                default: [
+                    "Texas Medical Board (TMB) delegation protocols and standing orders signed.",
+                    "Physician-patient relationship established prior to aesthetic procedure.",
+                    "Licensed practitioner status confirmed through state board registry.",
+                    "Emergency response protocol and equipment inspected."
+                ],
+                laser: [
+                    "Non-ablative or ablative laser certificate displayed per TMB rules.",
+                    "Physician supervision rules followed according to laser type."
+                ]
+            },
+            "Florida": {
+                default: [
+                    "Florida Board of Medicine supervisory protocols established.",
+                    "Initial patient GFE conducted by physician, PA, or APRN before treatment delivery.",
+                    "Licensed medical director oversight agreement active.",
+                    "Adverse incident reporting and emergency equipment protocols ready."
+                ],
+                laser: [
+                    "Written protocols for cosmetic laser procedures signed by Medical Director.",
+                    "Staff credentialing and laser safety training documentation verified."
+                ]
+            },
+            "New York": {
+                default: [
+                    "NY Education Department & Department of Health medical practice compliance verified.",
+                    "Mandatory pre-treatment medical evaluation conducted under physician oversight.",
+                    "Strict practitioner scope of practice and delegation rules enforced.",
+                    "Emergency equipment and clinical documentation logs maintained for audit."
+                ],
+                laser: [
+                    "Laser procedures classified as practice of medicine; strict physician delegation required.",
+                    "Operator training and safety credential verification logs completed."
+                ]
+            }
+        };
+
         function generateChecklist() {
             const state = document.getElementById('state').value;
-            const treatment = document.getElementById('treatment').value || 'General Aesthetics';
+            const treatmentInput = document.getElementById('treatment').value.toLowerCase();
             
             const resultDiv = document.getElementById('result');
             const resultTitle = document.getElementById('result-title');
             const resultList = document.getElementById('result-list');
 
-            resultTitle.innerText = `Compliance Requirements for ${treatment} in ${state}:`;
-            resultList.innerHTML = `
-                <li>Medical Director oversight agreement verified for ${state}.</li>
-                <li>Good Faith Exam (GFE) protocol established prior to ${treatment}.</li>
-                <li>State board licensed practitioner requirement confirmed.</li>
-                <li>Emergency equipment and adverse event logs ready for audit.</li>
-            `;
+            let requirements = complianceDatabase[state].default;
+            
+            if (treatmentInput.includes('laser') || treatmentInput.includes('hair removal') || treatmentInput.includes('light')) {
+                requirements = requirements.concat(complianceDatabase[state].laser);
+            }
+
+            resultTitle.innerText = `Compliance Requirements for ${document.getElementById('treatment').value || 'Aesthetics'} in ${state}:`;
+            
+            let listHTML = '';
+            requirements.forEach(req => {
+                listHTML += `<li>${req}</li>`;
+            });
+            resultList.innerHTML = listHTML;
+            
             resultDiv.style.display = 'block';
         }
 
