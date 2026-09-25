@@ -48,7 +48,7 @@
             padding: 12px; 
             width: 100%; 
             font-size: 1rem; 
-            margin-bottom: 20px; 
+            margin-bottom: 15px; 
             background-color: var(--input-bg);
             border: 1px solid var(--border-color); 
             color: var(--text-primary);
@@ -59,6 +59,36 @@
             outline: none;
             border-color: #58a6ff;
         }
+        
+        /* Category Pill Buttons Styling */
+        .category-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .pill-btn {
+            background-color: #21262d;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: auto;
+            margin-bottom: 0;
+        }
+        .pill-btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+        }
+        .pill-btn.active {
+            background-color: #1f6feb;
+            border-color: #388bfd;
+            color: #ffffff;
+        }
+
         button { 
             padding: 12px 20px; 
             font-size: 1rem; 
@@ -166,7 +196,7 @@
             <option value="Colorado">Colorado</option>
             <option value="Connecticut">Connecticut</option>
             <option value="Delaware">Delaware</option>
-            <option value="Florida">Florida</option>
+            <option value="Florida" selected>Florida</option>
             <option value="Georgia">Georgia</option>
             <option value="Hawaii">Hawaii</option>
             <option value="Idaho">Idaho</option>
@@ -210,8 +240,17 @@
             <option value="Wyoming">Wyoming</option>
         </select>
 
-        <label for="treatment">Primary Treatment:</label>
-        <input type="text" id="treatment" placeholder="e.g., Botox, Laser, Filler, IV Therapy">
+        <label>Select Treatment Specialty:</label>
+        <div class="category-pills">
+            <button type="button" class="pill-btn active" onclick="setTreatment('Botox & Dermal Fillers', this)">Injectables (Botox/Fillers)</button>
+            <button type="button" class="pill-btn" onclick="setTreatment('Laser Hair Removal & Skin Resurfacing', this)">Laser & Energy Devices</button>
+            <button type="button" class="pill-btn" onclick="setTreatment('IV Hydration & Vitamin Therapy', this)">IV Infusion & Wellness</button>
+            <button type="button" class="pill-btn" onclick="setTreatment('Microneedling & Chemical Peels', this)">Aesthetics & Skin</button>
+            <button type="button" class="pill-btn" onclick="setTreatment('Body Contouring & Cryolipolysis', this)">Body Contouring</button>
+        </div>
+
+        <label for="treatment">Or Type Custom Treatment:</label>
+        <input type="text" id="treatment" value="Botox & Dermal Fillers" placeholder="e.g., Botox, Laser, Filler, IV Therapy">
 
         <button onclick="generateChecklist()">Generate Requirements</button>
 
@@ -263,6 +302,15 @@
     </div>
 
     <script>
+        function setTreatment(treatmentName, btnElement) {
+            document.getElementById('treatment').value = treatmentName;
+            
+            // Update active pill styling
+            const pills = document.querySelectorAll('.pill-btn');
+            pills.forEach(p => p.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
         async function generateChecklist() {
             const state = document.getElementById('state').value;
             const treatment = document.getElementById('treatment').value || 'Aesthetics';
@@ -297,7 +345,6 @@
                         <tr>
                             <td style="text-align: center; font-weight: 600; color: #57606a;">AI-${index + 1}</td>
                             <td><strong>${req.item}</strong>: ${req.description}</td>
-
                             <td style="text-align: center;"><span class="status-badge" style="background-color: #cf222e; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Pending Review</span></td>
                         </tr>
                     `;
