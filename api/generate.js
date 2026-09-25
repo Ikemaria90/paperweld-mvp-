@@ -1,51 +1,51 @@
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { state, treatment } = req.body;
+
+  if (!state || !treatment) {
+    return res.status(400).json({ error: 'State and treatment are required.' });
+  }
+
+  try {
+    const prompt = `You are a strict medical spa regulatory and compliance expert for the United States. 
+Generate a JSON object with a key named "requirements" containing an array of 5 specific compliance audit requirements for ${treatment} practices in the state of ${state}.
+Each object in the array must have three keys:
+1. "item": A short title for the requirement (e.g., "Medical Director Supervision").
+2. "description": A clear explanation of what the regulation demands in ${state}.
+3. "risk": Exactly one of these three string values: "Critical", "Operational", or "Best Practice".
+
+Return ONLY valid JSON with no markdown formatting or extra text. Example format:
+{
+  "requirements": [
+    {
+      "item": "Medical Supervision",
+      "description": "A licensed physician must oversee treatments.",
+      "risk": "Critical"
     }
+  ]
+}`;
 
-    const { state, treatment } = req.body;
-    const apiKey = process.env.OPENAI_API_KEY;
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.3,
+    });
 
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API key is missing' });
-    }
+    const content = completion.choices[0].message.content;
+    const parsedData = JSON.parse(content.trim());
 
-    try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content: 'You are an expert regulatory compliance assistant for medical spas. Return a strict JSON array containing 5 compliance requirements for the given state and treatment. Each item must have "item", "description", and "status" fields.'
-                    },
-                    {
-                        role: 'user',
-                        content: `Provide compliance requirements for ${treatment} in ${state}.`
-                    }
-                ],
-                temperature: 0.3
-            })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.error?.message || 'OpenAI API error');
-        }
-
-        const aiText = data.choices[0].message.content;
-        const cleanedJSON = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
-        const requirements = JSON.parse(cleanedJSON);
-
-        return res.status(200).json({ requirements });
-    } catch (error) {
-        console.error("DETAILED ERROR:", error);
-        return res.status(500).json({ error: error.message });
-    }
+    return res.status(200).json(parsedData);
+  } catch (error) {
+    console.error('OpenAI Error:', error);
+    return res.status(500).json({ error: 'Failed to generate requirements from AI.' });
+  }
 }
