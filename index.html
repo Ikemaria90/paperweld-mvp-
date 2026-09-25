@@ -152,13 +152,29 @@
             color: #24292e;
             background-color: #ffffff;
         }
+        
+        /* Risk Badges */
+        .risk-badge {
+            display: inline-block;
+            padding: 3px 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #ffffff;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .risk-critical { background-color: #cf222e; }
+        .risk-operational { background-color: #9a6700; }
+        .risk-best-practice { background-color: #0969da; }
+
         .status-badge {
             display: inline-block;
             padding: 4px 8px;
             font-size: 0.75rem;
             font-weight: 600;
             color: #ffffff;
-            background-color: #cf222e;
+            background-color: #57606a;
             border-radius: 4px;
             text-transform: uppercase;
         }
@@ -174,6 +190,7 @@
             .export-box button, .export-box label, .export-box input { display: none !important; }
             #pdf-content { display: block !important; background-color: #ffffff !important; color: #000000 !important; border: none !important; padding: 0 !important; }
             .audit-table th { background-color: #f6f8fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .risk-badge { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -274,8 +291,8 @@
                 <thead>
                     <tr>
                         <th style="width: 8%;">Ref</th>
-                        <th style="width: 74%;">Regulatory Requirement</th>
-                        <th style="width: 18%; text-align: center;">Status / Review</th>
+                        <th style="width: 72%;">Regulatory Requirement</th>
+                        <th style="width: 20%; text-align: center;">Risk / Status</th>
                     </tr>
                 </thead>
                 <tbody id="result-table-body">
@@ -305,7 +322,6 @@
         function setTreatment(treatmentName, btnElement) {
             document.getElementById('treatment').value = treatmentName;
             
-            // Update active pill styling
             const pills = document.querySelectorAll('.pill-btn');
             pills.forEach(p => p.classList.remove('active'));
             btnElement.classList.add('active');
@@ -341,11 +357,24 @@
                 
                 let rowsHTML = '';
                 requirements.forEach((req, index) => {
+                    let riskClass = 'risk-operational';
+                    let riskText = req.risk || 'Operational';
+                    if (riskText.toLowerCase().includes('critical')) {
+                        riskClass = 'risk-critical';
+                        riskText = 'Critical';
+                    } else if (riskText.toLowerCase().includes('best')) {
+                        riskClass = 'risk-best-practice';
+                        riskText = 'Best Practice';
+                    }
+
                     rowsHTML += `
                         <tr>
                             <td style="text-align: center; font-weight: 600; color: #57606a;">AI-${index + 1}</td>
                             <td><strong>${req.item}</strong>: ${req.description}</td>
-                            <td style="text-align: center;"><span class="status-badge" style="background-color: #cf222e; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">Pending Review</span></td>
+                            <td style="text-align: center;">
+                                <span class="risk-badge ${riskClass}">${riskText}</span><br>
+                                <span class="status-badge">Pending</span>
+                            </td>
                         </tr>
                     `;
                 });
